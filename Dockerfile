@@ -1,4 +1,4 @@
-ARG F_BUILD_ENV=35
+ARG F_BUILD_ENV=37
 FROM fedora:${F_BUILD_ENV}
 
 ARG F_BASE_BRANCH=f33
@@ -25,6 +25,7 @@ RUN rpmdev-setuptree \
 WORKDIR /root/rpmbuild
 	
 ADD https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/patch-${KERNEL_VERSION}.xz SOURCES/
+ADD SOURCES/* SOURCES/
 COPY SPECS/kernel-${KERNEL_VERSION}.spec SPECS/kernel.spec
 
 # RUN echo '%_smp_mflags -j4' >>~/.rpmmacros
