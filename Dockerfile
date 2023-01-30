@@ -27,5 +27,6 @@ WORKDIR /root/rpmbuild
 ADD https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/patch-${KERNEL_VERSION}.xz SOURCES/
 COPY SPECS/kernel-${KERNEL_VERSION}.spec SPECS/kernel.spec
 
-RUN dnf builddep -y SPECS/kernel.spec \
-  && rpmbuild -ba SPECS/kernel.spec ${RPMBUILD_ARGS}
+# RUN echo '%_smp_mflags -j4' >>~/.rpmmacros
+RUN dnf builddep -y SPECS/kernel.spec
+RUN rpmbuild -ba SPECS/kernel.spec ${RPMBUILD_ARGS}

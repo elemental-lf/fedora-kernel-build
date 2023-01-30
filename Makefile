@@ -1,10 +1,11 @@
-KERNEL_VERSION=5.10.113
+KERNEL_VERSION=5.10.133
 export DOCKER_BUILDKIT = 1
 
 all:
-	docker build --rm=true \
-	  --build-arg=KERNEL_VERSION=$(KERNEL_VERSION) \
+	docker build \
+	  --rm \
 	  --force-rm \
+	  --build-arg=KERNEL_VERSION=$(KERNEL_VERSION) \
 	  -t fedora-kernel-build .
 	-docker rm --force fedora-kernel-build
 	docker run --name=fedora-kernel-build fedora-kernel-build
