@@ -1,0 +1,42 @@
+ARG F_BUILD_ENV=39
+FROM fedora:36 as srpm_build
+
+ARG F_BASE_BRANCH=f33
+# This is the last commit with a 5.10 kernel.
+ARG F_BASE_COMMIT=8cb9b8957f6c41855069d943280362fbf45cdbf1
+ARG F_BASE_SRPM=kernel-5.10.23-200.fc33.src.rpm
+
+RUN dnf install -y rpm-build joe fedpkg fedora-packager rpmdevtools
+	
+WORKDIR /root
+
+# Build the original source RPM as a starting point
+RUN rpmdev-setuptree \
+  && fedpkg clone -a kernel \
+  && cd kernel \
+  && fedpkg switch-branch ${F_BASE_BRANCH} \
+  && git reset --hard ${F_BASE_COMMIT} \
+  && fedpkg srpm
+
+ARG F_BASE_SRPM=kernel-5.10.23-200.fc33.src.rpm
+FROM fedora:${F_BUILD_ENV} as rpm_build
+
+ARG KERNEL_VERSION
+ARG RPMBUILD_ARGS="--with baseonly --without configchecks"
+ARG F_BASE_SRPM=kernel-5.10.23-200.fc33.src.rpm
+
+RUN dnf install -y rpm-build joe rpmdevtools ncurses-devel pesign grubby python3-dnf-plugins-core python-rpm-macros \
+  && rpmdev-setuptree
+	
+WORKDIR /root/rpmbuild
+
+COPY --from=srpm_build "/root/kernel/${F_BASE_SRPM}" "/root/rpmbuild/SRPMS/${F_BASE_SRPM}"
+
+RUN rpm -ivh "/root/rpmbuild/SRPMS/${F_BASE_SRPM}"
+#ADD https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/patch-${KERNEL_VERSION}.xz SOURCES/
+COPY SOURCES/* SOURCES/
+COPY SPECS/kernel-${KERNEL_VERSION}.spec SPECS/kernel.spec
+
+RUN echo '%_smp_mflags -j8' >>~/.rpmmacros
+RUN dnf builddep -y SPECS/kernel.spec \
+  && rpmbuild -ba SPECS/kernel.spec ${RPMBUILD_ARGS}
