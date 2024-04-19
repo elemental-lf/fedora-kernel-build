@@ -41,8 +41,8 @@ rpmbuild:
     ARG RPMBUILD_ARGS='--with baseonly --without configchecks'
     ARG SMP_MFLAGS='-j8'
 
-    RUN echo "%_smp_mflags ${SMP_MFLAGS}" >>~/.rpmmacros
-    RUN dnf builddep -y SPECS/kernel.spec && \
+    RUN echo "%_smp_mflags ${SMP_MFLAGS}" >>~/.rpmmacros && \
+      dnf builddep -y SPECS/kernel.spec && \
       rpmbuild -ba SPECS/kernel.spec ${RPMBUILD_ARGS}
 
     SAVE ARTIFACT /root/rpmbuild/RPMS/* AS LOCAL ./RPMS/
