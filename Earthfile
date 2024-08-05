@@ -39,7 +39,8 @@ rpmbuild:
     COPY SPECS/kernel-${KERNEL_VERSION}.spec SPECS/kernel.spec
 
     ARG RPMBUILD_ARGS='--with baseonly --without configchecks'
-    ARG SMP_MFLAGS='-j8'
+    # 4 CPUs, see https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+    ARG SMP_MFLAGS='-j4'
 
     RUN echo "%_smp_mflags ${SMP_MFLAGS}" >>~/.rpmmacros && \
       dnf builddep -y SPECS/kernel.spec && \
