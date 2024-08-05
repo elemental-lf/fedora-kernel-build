@@ -45,7 +45,7 @@ rpmbuild:
       dnf builddep -y SPECS/kernel.spec && \
       rpmbuild -ba SPECS/kernel.spec ${RPMBUILD_ARGS}
 
-    SAVE ARTIFACT /root/rpmbuild/RPMS/* AS LOCAL ./RPMS/
+    SAVE ARTIFACT --keep-ts /root/rpmbuild/RPMS/* AS LOCAL ./RPMS/$KERNEL_VERSION/
 
 build:
     BUILD +rpmbuild
