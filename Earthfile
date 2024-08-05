@@ -1,6 +1,6 @@
 VERSION 0.7
 
-ARG --global KERNEL_VERSION=5.10.223
+ARG --global --required KERNEL_VERSION
 ARG --global F_BASE_SRPM=kernel-5.10.23-200.fc33.src.rpm
 
 srpmbuild:
